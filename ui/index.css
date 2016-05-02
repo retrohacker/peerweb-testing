@@ -1,17 +1,17 @@
 body {
   margin: 0px;
-}
-
-.browser {
   display: flex;
   flex-direction: column;
 }
 
 #content {
- flex-grow: 999999999;
+  display: flex;
+  flex-grow: 999999999;
 }
 
 .nav-bar {
+  display: flex;
+  flex-direction: column;
   background-color: #3F51B5;
 }
 
@@ -49,9 +49,9 @@ body {
 
 webview {
   display: none;
-  height: 100%;
 }
 
 webview.selected {
   display: flex;
+  flex-grow: 99999999;
 }
