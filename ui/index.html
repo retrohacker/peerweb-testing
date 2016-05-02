@@ -1,30 +1,32 @@
 <html>
   <head>
     <link rel="stylesheet" href="./index.css">
+    <link rel="stylesheet" href="./search.css">
+    <link rel="stylesheet" href="./tab.css">
     <script src="./index.js"></script>
     <script src="./tabs.js"></script>
   </head>
   <body>
     <div class="nav-bar">
       <div id="tab-row">
-        <span class="tab-add button" onclick="new_tab(this)">
+        <div class="tab-add button" onclick="new_tab(this)">
           +
-        </span>
+        </div>
       </div>
       <div class="search-row">
-        <span class="search-back button">
-          &#8592;
-        </span>
-        <span class="search-forward button">
-          &#8594;
-        </span>
-        <span class="search-forward button">
+        <div class="search-back button">
+          &#10148;
+        </div>
+        <div class="search-forward button">
+          &#10148;
+        </div>
+        <div class="search-refresh button">
           &#8635;
-        </span>
-        <span id="search-bar-wrap">
+        </div>
+        <div id="search-bar-wrap">
           <div class="logo">&#9883;</div>
           <input type="text" id="search-bar"></input>
-        </span>
+        </div>
       </div>
     </div>
     <div id="content"></div>
