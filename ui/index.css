@@ -26,6 +26,10 @@ body {
   height: 30;
   margin: 5px 10px;
   padding-right: 10px;
+  /* Grow as large as possible */
+  display: flex;
+  flex-grow: 9999999;
+  align-items: center;
 }
 
 #search-bar {
@@ -44,8 +48,8 @@ body {
 }
 
 #search-bar-wrap .logo {
-  display: inline-block;
   padding-left: 10px;
+  display: flex;
 }
 
 #tab-row {
