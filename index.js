@@ -8,6 +8,7 @@
  *
 */
 var config = require('./config.json')
+require('electron-debug')({showDevTools: true})
 
 /* Begin Dependencies */
 

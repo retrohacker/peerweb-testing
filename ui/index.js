@@ -1,29 +1,36 @@
+// TODO: Rethink this file, rename, refactor, and comment
+
+/* Define required globals */
+
+// The newTab function is provided by /ui/tabs.js
+/* global newTab */
+
+/* Done with globals */
+
 // Convention in this file is to name functions called in respoonse DOM
 // element events with an `_` and all other functions in camelCase.
-function check_submit(e) {
-  console.log('keypress')
-  if(!e) return null
-  if(e.keyCode === 13) {
-    console.log('enter')
-    return submitUrl(e.target.value)
-  }
-}
-
-function submitUrl(url) {
-  var webviews = window.document.getElementsByTagName('webview')
-  for(var i = 0; i < webviews.length; i++) {
-    var webview = webviews[i]
-    if(webview.className.indexOf('selected') !== -1) {
+function submitUrl (url) {
+  const webviews = window.document.getElementsByTagName('webview')
+  let webview = null
+  for (let i = 0; i < webviews.length; i++) {
+    webview = webviews[i]
+    if (webview.className.indexOf('selected') !== -1) {
       break
     }
   }
-  console.log(url)
-  console.log(webview)
   webview.loadURL(url)
 }
 
-window.addEventListener('load',function() {
+function checkSubmit (e) {
+  if (e == null) return null
+  if (e.keyCode === 13) {
+    return submitUrl(e.target.value)
+  }
+  return null
+}
+
+window.addEventListener('load', function addSearchBarEventListener () {
   document.getElementById('search-bar')
-    .addEventListener('keypress',check_submit)
-  new_tab()
+    .addEventListener('keypress', checkSubmit)
+  newTab()
 })

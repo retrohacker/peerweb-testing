@@ -9,7 +9,7 @@ body {
   flex-grow: 999999999;
 }
 
-.nav-bar {
+#nav-bar {
   display: flex;
   flex-direction: column;
   background-color: #3F51B5;
