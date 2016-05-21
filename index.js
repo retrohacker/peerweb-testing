@@ -65,7 +65,7 @@ function peerProtocolHandler(request, callback) {
   // directory using the torrent's hash and have webtorrent download it's
   // contents there
   var opts = {
-    //announce: config.announce,
+    announce: config.announce,
     path: path.join(__dirname,'downloads',hash)
   }
 
