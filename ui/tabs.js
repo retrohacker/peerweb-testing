@@ -20,7 +20,7 @@ peerWeb.tabs = peerWeb.tabs || {}
   // tabClick is registered as an event listener on every tab. Its purpose
   // is to determine if a click event represents a user trying to click on a
   // tab. If the click was meant to go to the tab, then the work is passed off
-  // to the claimOwnership function from ownership.js to handle updating the
+  // to the claimOwnership function from ui.js to handle updating the
   // browser accordingly.
   peerWeb.tabs.tabClick = function tabClick (e) {
     // Get the target DOM element of the event
