@@ -1,3 +1,13 @@
+/*
+ * tabs.js
+ *
+ * This file contains all of the code immediately relevant to the tabs in the
+ * browser UI.
+ *
+ * All logic associated with updating the UI in response to an event triggered
+ * by a tab is delegated to ui.js
+ */
+
 // Create a global singleton that scopes the globally exposed functions from
 // this application
 // eslint-disable-next-line prefer-const, no-use-before-define, no-var

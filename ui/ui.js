@@ -130,4 +130,30 @@ peerWeb.ui = peerWeb.ui || {}
 
     peerWeb.ui.claimOwnership(id)
   }
+
+  // navigate will take a url and will update the browser state to prepare for
+  // the user to be sent to a new webpage. This makes the assumption that the
+  // navigation is happening on the _currently selected_ tab.
+  peerWeb.ui.navigate = function navigate (id, url) {
+    // collect all the webviews and find which one is currently selected
+    const webviews = window.document.getElementsByTagName('webview')
+    // We create the webview variable outside of the for loop, and terminate
+    // the loop immediately when we find the webview we are looking for. This
+    // ensures webview will either be the currently selected webview or that
+    // we will navigate the last tab in the event there is no selected webview
+    // (which would be a bug)
+    let webview = null
+    for (let i = 0; i < webviews.length; i++) {
+      webview = webviews[i]
+      if (peerWeb.utils.hasClass('selected')) {
+        break
+      }
+    }
+
+    // We have found the webview we are looking for as defined above, now lets
+    // send it to the page we are looking for
+    webview.loadURL(url)
+
+    // TODO wire up all even listeners and begin loading animations
+  }
 })()

@@ -3,10 +3,16 @@
     <link rel="stylesheet" href="./index.css">
     <link rel="stylesheet" href="./search.css">
     <link rel="stylesheet" href="./tabs.css">
-    <script src="./index.js"></script>
+    <script src="./search.js"></script>
     <script src="./utils.js"></script>
     <script src="./ui.js"></script>
     <script src="./tabs.js"></script>
+    <script type="text/javascript">
+      // When the window is done loading, lets add a new tab
+      window.addEventListener('load', function bootstrapUI () {
+        peerWeb.tabs.newTab()
+      })
+    </script>
   </head>
   <body>
     <div id="nav-bar">
@@ -27,7 +33,7 @@
         </div>
         <div id="search-bar-wrap">
           <div class="logo">&#9883;</div>
-          <input type="text" id="search-bar"></input>
+          <input type="text" id="search-bar" onkeypress="peerWeb.search.checkSubmit(this)"></input>
         </div>
       </div>
     </div>
