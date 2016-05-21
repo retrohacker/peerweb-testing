@@ -68,6 +68,17 @@ test('Tab functionality', function(t) {
       return
     })
     .then(function () {
+      return app.client.click('#tab-2')
+    })
+    .then(function () {
+      return app.client.isVisibleWithinViewport('#webview-2')
+    })
+    .then(function (isVisible) {
+      t.equal(isVisible,
+              true,
+              'webview becomes visible when corresponding tab is clicked')
+    })
+    .then(function () {
       return app.client.click('.close-tab')
     })
     .then(function() {

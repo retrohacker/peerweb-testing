@@ -30,7 +30,7 @@ peerWeb.ui = peerWeb.ui || {}
     // We need to fetch all of the webviews on the page, remove the CSS class
     // `selected` from any that have it set, and add the CSS class name
     // `selected` to the webview that belongs to this tab.
-    const webviews = window.document.getElementsByClassName('webview')
+    const webviews = window.document.getElementsByTagName('webview')
     for (let i = 0; i < webviews.length; i++) {
       const webview = webviews[i]
       // Remove `selected` from all of the webviews, even the one that is
@@ -38,10 +38,9 @@ peerWeb.ui = peerWeb.ui || {}
       // element multiple times.
       webview.className = peerWeb.utils.removeClass(webview, 'selected')
       // If this webview matches the id of the selected tab, add the CSS class
-      // `selected` to it. The id of that webview is encoded as `webview-ID`.
-      // We force id to be a string for this comparison so that we can use
-      // strict equality.
-      if (webview.id.split('-')[1] === id.toString()) {
+      // `selected` to it. We force id to be a string for this comparison so
+      // that we can use strict equality.
+      if (peerWeb.utils.getId(webview) === id.toString()) {
         webview.className = peerWeb.utils.addClass(webview, 'selected')
       }
     }
@@ -51,8 +50,8 @@ peerWeb.ui = peerWeb.ui || {}
     for (let i = 0; i < tabs.length; i++) {
       const tab = tabs[i]
       tab.className = peerWeb.utils.removeClass(tab, 'selected')
-      if (tab.id.split('-') === id.toString()) {
-        tab.className = peerWeb.utils.addClass('selected')
+      if (peerWeb.utils.getId(tab) === id.toString()) {
+        tab.className = peerWeb.utils.addClass(tab, 'selected')
       }
     }
   }

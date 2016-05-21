@@ -17,7 +17,12 @@ peerWeb.utils = peerWeb.utils || {}
   // addClass adds a CSS class to a DOM element and returns the new
   // string-separated list of class names as a result
   peerWeb.utils.addClass = function addClass (element, c) {
-    return `${element.className} c`
+    // Ensure we don't add an empty space at the beginning if there are no
+    // currently existing classes
+    if (element.className.length === 0) {
+      return c
+    }
+    return `${element.className} ${c}`
   }
 
   // removeClass removes a CSS class element from a DOM element and returns
