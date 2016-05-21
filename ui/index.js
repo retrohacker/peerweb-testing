@@ -1,11 +1,6 @@
 // TODO: Rethink this file, rename, refactor, and comment
 
-/* Define required globals */
-
-// The newTab function is provided by /ui/tabs.js
-/* global newTab */
-
-/* Done with globals */
+/* global peerWeb */
 
 // Convention in this file is to name functions called in respoonse DOM
 // element events with an `_` and all other functions in camelCase.
@@ -32,5 +27,5 @@ function checkSubmit (e) {
 window.addEventListener('load', function addSearchBarEventListener () {
   document.getElementById('search-bar')
     .addEventListener('keypress', checkSubmit)
-  newTab()
+  peerWeb.tabs.newTab()
 })
