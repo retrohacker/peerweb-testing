@@ -12,7 +12,7 @@ body {
 #nav-bar {
   display: flex;
   flex-direction: column;
-  background-color: #3F51B5;
+  background-color: #222831;
 }
 
 .search-row {
@@ -44,7 +44,7 @@ body {
 }
 
 .button:hover, .tab.selected {
-  background-color: #5C6BC0;
+  background-color: #2D4059;
 }
 
 webview {
