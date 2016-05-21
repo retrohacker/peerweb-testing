@@ -3,14 +3,21 @@
     <link rel="stylesheet" href="./index.css">
     <link rel="stylesheet" href="./search.css">
     <link rel="stylesheet" href="./tabs.css">
+    <link rel="stylesheet" href="./progress.css">
     <script src="./search.js"></script>
     <script src="./utils.js"></script>
     <script src="./ui.js"></script>
     <script src="./tabs.js"></script>
     <script type="text/javascript">
-      // When the window is done loading, lets add a new tab
+      // When the window is done loading...
       window.addEventListener('load', function bootstrapUI () {
+        // Create an initial tab
         peerWeb.tabs.newTab()
+
+        // Register the event listener for the search bar
+        window.document
+          .getElementById('search-bar')
+          .addEventListener('keypress', peerWeb.search.checkSubmit)
       })
     </script>
   </head>
@@ -33,7 +40,7 @@
         </div>
         <div id="search-bar-wrap">
           <div class="logo">&#9883;</div>
-          <input type="text" id="search-bar" onkeypress="peerWeb.search.checkSubmit(this)"></input>
+          <input type="text" id="search-bar"></input>
         </div>
       </div>
     </div>

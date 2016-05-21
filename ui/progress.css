@@ -1,0 +1,20 @@
+.progress {
+  height: 5px;
+  width: 100%;
+  background-color: #EEEEEE;
+  display: none;
+  position: fixed;
+}
+
+.progress .complete {
+  height: 100%;
+  width: 0%;
+  background-color: #FF5722;
+}
+
+/* only display the progress bar if it's corresponding tab is selected and
+ * it's corresponding webview is loading
+ */
+.progress.selected.loading {
+  display: block;
+}

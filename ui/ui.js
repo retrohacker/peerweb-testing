@@ -54,6 +54,16 @@ peerWeb.ui = peerWeb.ui || {}
         tab.className = peerWeb.utils.addClass(tab, 'selected')
       }
     }
+
+    // Do the same thing for the progressBars
+    const progressBars = window.document.getElementsByClassName('progress')
+    for (let i = 0; i < progressBars.length; i++) {
+      const progressBar = progressBars[i]
+      progressBar.className = peerWeb.utils.removeClass(progressBar, 'selected')
+      if (peerWeb.utils.getId(progressBar) === id.toString()) {
+        progressBar.className = peerWeb.utils.addClass(progressBar, 'selected')
+      }
+    }
   }
 
   // remove will take the ID of a tab, and handle all the logic necessary to
@@ -120,8 +130,24 @@ peerWeb.ui = peerWeb.ui || {}
     const newWebViewElement = window.document.createElement('webview')
     newWebViewElement.id = `webview-${id}`
 
+    // Register event listeners for the webview to wire up its state to the UI
+    newWebViewElement.addEventListener('did-stop-loading',
+                                       peerWeb.ui.endLoading)
+    newWebViewElement.addEventListener('did-start-loading',
+                                       peerWeb.ui.beginLoading)
+
+    // Next, we create the progress bar that will belong to the webview
+    const newProgressBar = window.document.createElement('div')
+    newProgressBar.id = `progress-${id}`
+    newProgressBar.className = 'progress'
+    newProgressComplete = window.document.createElement('div')
+    newProgressComplete.className = 'complete'
+    newProgressBar.appendChild(newProgressComplete)
+
+
     // Finally, we add everything to the document so the user can see it
     window.document.getElementById('tab-row').appendChild(newTabElement)
+    window.document.getElementById('content').appendChild(newProgressBar)
     window.document.getElementById('content').appendChild(newWebViewElement)
 
     // Give the user something to look at for their new tab
@@ -130,10 +156,37 @@ peerWeb.ui = peerWeb.ui || {}
     peerWeb.ui.claimOwnership(id)
   }
 
+  // beginLoading handles updating the browser state to reflect that a tab has
+  // started loading new content. It is an event listener that should be
+  // registered in response to an event emitted from a webview
+  peerWeb.ui.beginLoading = function beginLoading () {
+    // `this` refers to the webview that triggered the event
+    var id = peerWeb.utils.getId(this)
+    var progressBar = window.document.getElementById(`progress-${id}`)
+    // We will use the `progress` attribute to calculate how much time has
+    // passed since the download began. The width of the `completed` bar inside
+    // the progress bar will be a function of the amount of time that has
+    // passed
+    progressBar.setAttribute('progress', Date.now())
+    progressBar.className = peerWeb.utils.addClass(progressBar, 'loading')
+  }
+
+  // endLoading handles updating the browser state to reflect that a tab has
+  // finished loading new content. It is an event listener that should be
+  // registered in response to an event emitted from a webview
+  peerWeb.ui.endLoading = function endLoading () {
+    // `this` refers to the webview that triggered the event
+    var id = peerWeb.utils.getId(this)
+    var progressBar = window.document.getElementById(`progress-${id}`)
+    // We no longer need to track the progress of this download
+    progressBar.removeAttribute('progress')
+    progressBar.className = peerWeb.utils.removeClass(progressBar, 'loading')
+  }
+
   // navigate will take a url and will update the browser state to prepare for
   // the user to be sent to a new webpage. This makes the assumption that the
   // navigation is happening on the _currently selected_ tab.
-  peerWeb.ui.navigate = function navigate (id, url) {
+  peerWeb.ui.navigate = function navigate (url) {
     // collect all the webviews and find which one is currently selected
     const webviews = window.document.getElementsByTagName('webview')
     // We create the webview variable outside of the for loop, and terminate
@@ -152,7 +205,55 @@ peerWeb.ui = peerWeb.ui || {}
     // We have found the webview we are looking for as defined above, now lets
     // send it to the page we are looking for
     webview.loadURL(url)
-
-    // TODO wire up all even listeners and begin loading animations
   }
+
+  // updateProgress will go through the UI and update all progress bars that
+  // belong to a webview that is loading content and is visible
+  peerWeb.ui.updateProgress = function updateProgress () {
+    // Get the currently loading and visible progress bar if one exists.
+    // There will only ever be one of these at a time, since two progressBars
+    // can not be visible, and it is possible that the visible webview will not
+    // be loading so there may not be work to do here
+    var progressBar = window.document
+                        .querySelector('.progress.selected.loading .complete')
+
+    // If we didn't find a visible progress bar that belonged to a loading
+    // webview, we don't have any work left to do
+    if (progressBar == null) {
+      return null
+    }
+
+    // We store the initial start time of the webview download as the progress
+    // attribute on the DOM element of the progress bar, so lets grab that
+    // and turn it into a JavaScript date.
+    var started = progressBar.parentElement.getAttribute('progress')
+
+    // Lets get how much time has passed since the download started
+    var progress = Date.now() - started
+
+    // Lets calculate the width of the progress bar using a logaritmic function
+    // that starts out having the progress bar be "really" fast, and then slows
+    // down quickly to inch its way towards 100%. This function will take quite
+    // a while to reach 100%. You may wonder why the width is not a function of
+    // the actual download progress and instead a function of time. Well, we
+    // would be hard pressed to know how much data any one website needs to
+    // pull over the wire, since a successfully downloaded file could trigger
+    // the download of even more files. Instead of implementing the extremely
+    // complex logic of tracking the files pending download, and updating that
+    // when new files are added and reflecting all of that in the progress bar,
+    // we opted in for a simpler feedback mechanism.
+    var width = Math.log(progress)*10
+
+    // Make sure progress never exceeds 100%
+    if (width > 99.9) width = 99.9
+
+    // Finally, lets update the width of the progress bar
+    progressBar.setAttribute('style', `width:${width}`)
+  }
+
+  // Create an interval that updates all progress bars that are visible and
+  // loading. I suspect this will be hot code, and I'm a little concerned about
+  // querying the DOM in this. We will gather metrics in the future to see how
+  // this is impacting performance
+  setInterval(peerWeb.ui.updateProgress, 100)
 })()

@@ -19,15 +19,21 @@ peerWeb.utils = peerWeb.utils || {}
   peerWeb.utils.addClass = function addClass (element, c) {
     // Ensure we don't add an empty space at the beginning if there are no
     // currently existing classes
-    if (element.className.length === 0) {
+    if (element.className == null || element.className.length === 0) {
       return c
     }
+
     return `${element.className} ${c}`
   }
 
   // removeClass removes a CSS class element from a DOM element and returns
   // the new string-separated list of class names as a result
   peerWeb.utils.removeClass = function removeClass (element, c) {
+    // If there are no class names, we have no work to do
+    if (element.className == null || element.className.length === 0) {
+      return ''
+    }
+
     // Grab the current list of space-separated class names
     return element.className
         // Split around spaces to get an array of class names
