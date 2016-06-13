@@ -5,6 +5,7 @@
     "webtorrent": "0.81.2"
   },
   "devDependencies": {
+    "async": "^1.5.2",
     "devtron": "^1.1.0",
     "electron-packager": "7.0.1",
     "electron-prebuilt": "1.0.1",

@@ -42,10 +42,45 @@ peerWeb.ui = peerWeb.ui || {}
       // that we can use strict equality.
       if (peerWeb.utils.getId(webview) === id.toString()) {
         webview.className = peerWeb.utils.addClass(webview, 'selected')
+
+        // Update the searchbar to match the webview's content
+        const searchBar = window.document.getElementById('search-bar')
+        searchBar.value = webview.src
+
+        // Make the navigation buttons inactive if there is no history
+        const navBack = window.document.getElementById('search-back')
+        const navForward = window.document.getElementById('search-forward')
+        navBack.className = peerWeb.utils.removeClass(navBack, 'inactive')
+        navForward
+          .className = peerWeb.utils.removeClass(navForward, 'inactive')
+        navBack.className = peerWeb.utils.addClass(navBack, 'inactive')
+        navForward.className = peerWeb.utils.addClass(navForward, 'inactive')
+
+        try {
+          if (webview.canGoBack()) {
+            navBack.className = peerWeb.utils.removeClass(navBack, 'inactive')
+          }
+
+          if (webview.canGoForward()) {
+            navForward
+            .className = peerWeb.utils.removeClass(navForward, 'inactive')
+          }
+        } catch (e) {
+          webview.addEventListener('dom-ready', function webviewReady () {
+            if (webview.canGoBack()) {
+              navBack.className = peerWeb.utils.removeClass(navBack, 'inactive')
+            }
+
+            if (webview.canGoForward()) {
+              navForward
+              .className = peerWeb.utils.removeClass(navForward, 'inactive')
+            }
+          })
+        }
       }
     }
 
-    // Do the same thing for tabs that we did for webviews above
+        // Do the same thing for tabs that we did for webviews above
     const tabs = window.document.getElementsByClassName('tab')
     for (let i = 0; i < tabs.length; i++) {
       const tab = tabs[i]
@@ -84,6 +119,16 @@ peerWeb.ui = peerWeb.ui || {}
       }
     }
 
+    // Do the same thing for the progressBars
+    const progressBars = window.document.getElementsByClassName('progress')
+    for (let i = 0; i < progressBars.length; i++) {
+      const progressBar = progressBars[i]
+      if (peerWeb.utils.getId(progressBar) === id.toString()) {
+        progressBar.remove()
+        break
+      }
+    }
+
     // Now we will do the same exact thing for tabs that we did for the
     // webviews above
     const tabs = window.document.getElementsByClassName('tab')
@@ -94,13 +139,16 @@ peerWeb.ui = peerWeb.ui || {}
         // We will also need to check if this tab is the currently selected
         // one. If so, we need to switch the user to another tab before
         // deleting the one they are currently using.
-        if (peerWeb.utils.hasClass('selected')) {
-          // Set it to the first tab for simplicty. We may add more
-          // intelligence to this in the future
-          peerWeb.ui.claimOwnership(peerWeb.utils.getId(tabs[0]))
+        if (peerWeb.utils.hasClass(tab, 'selected')) {
+          if (tabs[i + 1] != null) {
+            peerWeb.ui.claimOwnership(peerWeb.utils.getId(tabs[i + 1]))
+          } else if (tabs[i - 1] != null) {
+            peerWeb.ui.claimOwnership(peerWeb.utils.getId(tabs[i - 1]))
+          }
         }
 
         tab.remove()
+
         break
       }
     }
@@ -112,7 +160,8 @@ peerWeb.ui = peerWeb.ui || {}
     // First, we create a new tab element
     const newTabElement = window.document.createElement('span')
     const tabName = window.document.createElement('span')
-    tabName.appendChild(window.document.createTextNode('New Tab'))
+    let tabNameText = window.document.createTextNode('New Tab')
+    tabName.appendChild(tabNameText)
     tabName.className = 'tab-name'
     newTabElement.appendChild(tabName)
     newTabElement.id = `tab-${id}`
@@ -140,10 +189,9 @@ peerWeb.ui = peerWeb.ui || {}
     const newProgressBar = window.document.createElement('div')
     newProgressBar.id = `progress-${id}`
     newProgressBar.className = 'progress'
-    newProgressComplete = window.document.createElement('div')
+    const newProgressComplete = window.document.createElement('div')
     newProgressComplete.className = 'complete'
     newProgressBar.appendChild(newProgressComplete)
-
 
     // Finally, we add everything to the document so the user can see it
     window.document.getElementById('tab-row').appendChild(newTabElement)
@@ -153,6 +201,14 @@ peerWeb.ui = peerWeb.ui || {}
     // Give the user something to look at for their new tab
     newWebViewElement.src = 'http://will.blankenship.io/peerweb'
 
+    // Wire up the tab's title to the webview
+    newWebViewElement
+      .addEventListener('page-title-updated', function updateTabTitle (event) {
+        tabNameText.remove()
+        tabNameText = window.document.createTextNode(event.title)
+        tabName.appendChild(tabNameText)
+      })
+
     peerWeb.ui.claimOwnership(id)
   }
 
@@ -161,8 +217,8 @@ peerWeb.ui = peerWeb.ui || {}
   // registered in response to an event emitted from a webview
   peerWeb.ui.beginLoading = function beginLoading () {
     // `this` refers to the webview that triggered the event
-    var id = peerWeb.utils.getId(this)
-    var progressBar = window.document.getElementById(`progress-${id}`)
+    const id = peerWeb.utils.getId(this)
+    const progressBar = window.document.getElementById(`progress-${id}`)
     // We will use the `progress` attribute to calculate how much time has
     // passed since the download began. The width of the `completed` bar inside
     // the progress bar will be a function of the amount of time that has
@@ -176,8 +232,8 @@ peerWeb.ui = peerWeb.ui || {}
   // registered in response to an event emitted from a webview
   peerWeb.ui.endLoading = function endLoading () {
     // `this` refers to the webview that triggered the event
-    var id = peerWeb.utils.getId(this)
-    var progressBar = window.document.getElementById(`progress-${id}`)
+    const id = peerWeb.utils.getId(this)
+    const progressBar = window.document.getElementById(`progress-${id}`)
     // We no longer need to track the progress of this download
     progressBar.removeAttribute('progress')
     progressBar.className = peerWeb.utils.removeClass(progressBar, 'loading')
@@ -197,7 +253,7 @@ peerWeb.ui = peerWeb.ui || {}
     let webview = null
     for (let i = 0; i < webviews.length; i++) {
       webview = webviews[i]
-      if (peerWeb.utils.hasClass('selected')) {
+      if (peerWeb.utils.hasClass(webview, 'selected')) {
         break
       }
     }
@@ -214,7 +270,7 @@ peerWeb.ui = peerWeb.ui || {}
     // There will only ever be one of these at a time, since two progressBars
     // can not be visible, and it is possible that the visible webview will not
     // be loading so there may not be work to do here
-    var progressBar = window.document
+    const progressBar = window.document
                         .querySelector('.progress.selected.loading .complete')
 
     // If we didn't find a visible progress bar that belonged to a loading
@@ -226,10 +282,10 @@ peerWeb.ui = peerWeb.ui || {}
     // We store the initial start time of the webview download as the progress
     // attribute on the DOM element of the progress bar, so lets grab that
     // and turn it into a JavaScript date.
-    var started = progressBar.parentElement.getAttribute('progress')
+    const started = progressBar.parentElement.getAttribute('progress')
 
     // Lets get how much time has passed since the download started
-    var progress = Date.now() - started
+    const progress = Date.now() - started
 
     // Lets calculate the width of the progress bar using a logaritmic function
     // that starts out having the progress bar be "really" fast, and then slows
@@ -242,13 +298,15 @@ peerWeb.ui = peerWeb.ui || {}
     // complex logic of tracking the files pending download, and updating that
     // when new files are added and reflecting all of that in the progress bar,
     // we opted in for a simpler feedback mechanism.
-    var width = Math.log(progress)*10
+    let width = Math.log(progress) * 10
 
     // Make sure progress never exceeds 100%
     if (width > 99.9) width = 99.9
 
     // Finally, lets update the width of the progress bar
     progressBar.setAttribute('style', `width:${width}`)
+
+    return null
   }
 
   // Create an interval that updates all progress bars that are visible and

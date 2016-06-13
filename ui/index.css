@@ -25,11 +25,15 @@ body {
   display: flex;
 }
 
-.search-back {
+#search-back {
   transform: scaleX(-1);
 }
 
-.search-refresh {
+.button.inactive {
+  color: #889;
+}
+
+#search-refresh {
   font-weight: bold;
   transform: rotate(.25turn);
 }

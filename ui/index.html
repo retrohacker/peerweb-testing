@@ -18,6 +18,21 @@
         window.document
           .getElementById('search-bar')
           .addEventListener('keypress', peerWeb.search.checkSubmit)
+
+        // Wire up event listeners for the navigation buttons
+        window.document
+          .getElementById('search-back')
+          .addEventListener('click', peerWeb.search.back)
+
+        // Wire up event listeners for the navigation buttons
+        window.document
+          .getElementById('search-forward')
+          .addEventListener('click', peerWeb.search.forward)
+
+        // Wire up event listeners for the navigation buttons
+        window.document
+          .getElementById('search-refresh')
+          .addEventListener('click', peerWeb.search.refresh)
       })
     </script>
   </head>
@@ -29,13 +44,13 @@
         </div>
       </div>
       <div class="search-row">
-        <div class="search-back button">
+        <div id="search-back" class="button">
           &#10148;
         </div>
-        <div class="search-forward button">
+        <div id="search-forward" class="button">
           &#10148;
         </div>
-        <div class="search-refresh button">
+        <div id="search-refresh" class="button">
           &#8635;
         </div>
         <div id="search-bar-wrap">
