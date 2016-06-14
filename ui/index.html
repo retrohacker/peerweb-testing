@@ -35,6 +35,13 @@
           .addEventListener('click', peerWeb.search.refresh)
       })
     </script>
+    <script>
+      var ipcRenderer = require('electron').ipcRenderer;
+      ipcRenderer.on('global-status-reply',(event,arg)=>{
+        console.log(arg);//Testing only
+      });
+      ipcRenderer.send('global-status','Anything');//Argument Doesn't Matter right now.
+    </script>
   </head>
   <body>
     <div id="nav-bar">

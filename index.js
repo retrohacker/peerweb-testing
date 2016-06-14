@@ -17,7 +17,8 @@ var path = require('path')
 
 // Electron is used to render a browser for the user
 var electron = require('electron')
-
+// IPC is used to convey torrent information to rendering process
+var ipcMain = require('electron').ipcMain
 // WebTorrent gives our application the ability to download/seed torrents
 var WebTorrent = require('webtorrent')
 
@@ -25,7 +26,18 @@ var WebTorrent = require('webtorrent')
 
 // Create a new client responsible for seeding/downloading torrents
 var client = new WebTorrent()
-
+//ipc Global Status channel , only for recieving Stat requests
+//Reply sent on : global-status-reply
+ipcMain.on('global-status',(event,arg)=>{
+  //(var)status contains WebTorrent Client Stats
+  var status = {
+    download:client.downloadSpeed,
+    upload:client.uploadSpeed,
+    shared:client.torrents.map((torrent)=>torrent.infoHash)
+  };
+  //Send Asynchronous reply.
+  event.sender.send('global-status-reply',status);//status is serialized internally
+});
 // registerTorrentProtocol takes an instance of electron and registers a
 // handler for our new protocol, allowing the instance of electron to resolve
 // requests against a torrent
@@ -72,7 +84,6 @@ function peerProtocolHandler(request, callback) {
   // Lets kick off the download through webtorrent
   client.add(hash, opts, function loaded(torrent) {
     console.log("Download started...")
-
     // Search the torrent for the requestedFile, if not found, return null
     var returnFile = null
     for(var i = 0; i < torrent.files.length; i++) {
