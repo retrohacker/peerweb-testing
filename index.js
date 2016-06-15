@@ -7,47 +7,114 @@
  * config.announce is an array of trackers to publish and check for torrents on
  *
 */
-var config = require('./config.json')
-require('electron-debug')({showDevTools: true})
+const config = require('./config.json')
+require('electron-debug')({ showDevTools: true })
 
 /* Begin Dependencies */
 
 // We use path to locate files on the local filesystem
-var path = require('path')
+const path = require('path')
 
 // Electron is used to render a browser for the user
-var electron = require('electron')
+const electron = require('electron') // eslint-disable-line import/no-unresolved
+
 // IPC is used to convey torrent information to rendering process
-var ipcMain = require('electron').ipcMain
+const ipcMain = electron.ipcMain
+
 // WebTorrent gives our application the ability to download/seed torrents
-var WebTorrent = require('webtorrent')
+const WebTorrent = require('webtorrent')
 
 /* End Dependencies */
 
 // Create a new client responsible for seeding/downloading torrents
-var client = new WebTorrent()
-//ipc Global Status channel , only for recieving Stat requests
-//Reply sent on : global-status-reply
-ipcMain.on('global-status',(event,arg)=>{
-  //(var)status contains WebTorrent Client Stats
-  var status = {
-    download:client.downloadSpeed,
-    upload:client.uploadSpeed,
-    shared:client.torrents.map((torrent)=>torrent.infoHash)
-  };
-  //Send Asynchronous reply.
-  event.sender.send('global-status-reply',status);//status is serialized internally
-});
+const client = new WebTorrent()
+
+// ipc Global Status channel , only for recieving Stat requests
+// Reply sent on : global-status-reply
+ipcMain.on('global-status', function updateStatus (event, arg) {
+  // status contains WebTorrent Client Stats
+  const status = {
+    download: client.downloadSpeed,
+    upload: client.uploadSpeed,
+    shared: client.torrents
+  }
+  // Send Asynchronous reply.
+  event.sender.send('global-status-reply', status)// status is serialized internally
+})
+
+// peerProtocolHandler resolves a peer:// request against a torrent, returning
+// the requested file as the result
+function peerProtocolHandler (request, callback) {
+  console.log('Starting download...') // eslint-disable-line no-console
+  // Grab the URL as an array, split around '/', and removing the prefixed
+  // protocol. This allows us to break the path apart further down
+  const url = request
+                .url
+                .substring((`${config.protocol}://`).length)
+                .split('/')
+
+  // Our hash always comes first
+  const hash = url[0]
+
+  // If our url only contained a hash, then return the index.html file from
+  // the requested torrent, otherwise return the requested file
+  let requestedFile = 'index.html'
+
+  if (url.length !== 1) {
+    requestedFile = path.join.apply(null, url.slice(1))
+  }
+
+  // We want webtorrent to use the trackers from our config. We also create a
+  // directory using the torrent's hash and have webtorrent download it's
+  // contents there
+  const opts = {
+    announce: config.announce,
+    path: path.join(__dirname, 'downloads', hash)
+  }
+
+  // Lets kick off the download through webtorrent
+  client.add(hash, opts, function loaded (torrent) {
+    console.log('Download started...') // eslint-disable-line no-console
+    // Search the torrent for the requestedFile, if not found, return null
+    let returnFile = null
+    for (let i = 0; i < torrent.files.length; i++) {
+      console.log('Downloaded file', i) // eslint-disable-line no-console
+      const file = torrent.files[i]
+      // Webtorrent prepends the torrent name to the beginning of the file,
+      // we want to remove that when searching for the requested file
+      const name = file.path.substring((`${torrent.name}/`).length)
+      if (name === requestedFile) {
+        // found it!
+        returnFile = file
+      }
+    }
+
+    // If we found the file, get a path to the file, otherwise return null
+    let file = null
+    if (returnFile) {
+      file = path
+              .normalize(path.join(__dirname,
+                                   'downloads',
+                                   hash,
+                                   returnFile.path))
+    }
+
+    // Give electron a path to the file on the local fs
+    return callback({ path: file })
+  })
+}
+
 // registerTorrentProtocol takes an instance of electron and registers a
 // handler for our new protocol, allowing the instance of electron to resolve
 // requests against a torrent
-function registerTorrentProtocol(electron, cb) {
-  electron
+function registerTorrentProtocol (localElectron, cb) {
+  localElectron
     .protocol
     .registerFileProtocol(config.protocol, peerProtocolHandler,
-                          function registeredProtocol(e) {
-                            if(e)
+                          function registeredProtocol (e) {
+                            if (e) {
                               return cb(e)
+                            }
                             // Don't treat our new protocol like http
                             electron.protocol.registerStandardSchemes([config.protocol])
                             // Done setting up our new protocol
@@ -55,89 +122,30 @@ function registerTorrentProtocol(electron, cb) {
                           })
 }
 
-// peerProtocolHandler resolves a peer:// request against a torrent, returning
-// the requested file as the result
-function peerProtocolHandler(request, callback) {
-  console.log("Starting download...")
-  // Grab the URL as an array, split around '/', and removing the prefixed
-  // protocol. This allows us to break the path apart further down
-  var url = request.url.substring((config.protocol+'://').length).split('/')
-
-  // Our hash always comes first
-  var hash = url[0]
-
-  // If our url only contained a hash, then return the index.html file from
-  // the requested torrent, otherwise return the requested file
-  var requestedFile = 'index.html'
-
-  if(url.length !== 1) {
-    requestedFile = path.join.apply(null,url.slice(1))
-  }
-
-  // We want webtorrent to use the trackers from our config. We also create a
-  // directory using the torrent's hash and have webtorrent download it's
-  // contents there
-  var opts = {
-    announce: config.announce,
-    path: path.join(__dirname,'downloads',hash)
-  }
-
-  // Lets kick off the download through webtorrent
-  client.add(hash, opts, function loaded(torrent) {
-    console.log("Download started...")
-    // Search the torrent for the requestedFile, if not found, return null
-    var returnFile = null
-    for(var i = 0; i < torrent.files.length; i++) {
-      console.log("Downloaded file",i)
-      var file = torrent.files[i]
-      // Webtorrent prepends the torrent name to the beginning of the file,
-      // we want to remove that when searching for the requested file
-      var name = file.path.substring((torrent.name+'/').length)
-      if(name === requestedFile) {
-        // found it!
-        returnFile = file
-      }
-    }
-
-    // If we found the file, get a path to the file, otherwise return null
-    var file = null
-    if(returnFile) {
-      file = path.normalize(__dirname+'/downloads/'+hash+'/'+returnFile.path)
-    }
-
-    // Give electron a path to the file on the local fs
-    return callback({path: file })
-  })
-}
-
 // configureElectron registers the custom protocol with or electron app
-function configureElectron() {
+function configureElectron () {
   // electron is now ready to be configured
-  registerTorrentProtocol(electron, function init2(e) {
-    if(e) throw e
+  registerTorrentProtocol(electron, function init2 (e) {
+    if (e) {
+      throw e
+    }
+
     // peer:// protocol has been registered
-    var opts = {
-      frame: false,
+    const opts = {
+      frame: false
     }
 
     // Start the application
-    var mainWindow = new electron.BrowserWindow(opts)
-    mainWindow.loadURL('file://'+__dirname+'/ui/index.html')
+    const mainWindow = new electron.BrowserWindow(opts)
+    mainWindow.loadURL(`file://${path.join(__dirname, 'ui', 'index.html')}`)
   })
 }
 
-
 // The main logic of our application. This is what runs when called directly
 // from the command line
-function applicationLogic() {
+function applicationLogic () {
   electron.app.on('ready', configureElectron)
 }
 
-// If we are called directly from the command line, kick off the application
-return applicationLogic()
-
-// Export all of our logic for testing
-module.exports.registerTorrentProtocol = registerTorrentProtocol
-module.exports.peerProtocolHandler = peerProtocolHandler
-module.exports.configureElectron = configureElectron
-module.exports.applicationLogic = applicationLogic
+// Kick off the application
+applicationLogic()

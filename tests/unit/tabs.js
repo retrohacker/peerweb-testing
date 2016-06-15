@@ -1,4 +1,6 @@
 'use strict'
+
+/* eslint-disable func-names */
 const test = require('tape')
 const buildBinary = require('../build.js')
 const spectron = require('spectron')
@@ -15,7 +17,7 @@ let app = null
 test('Get path to binary', function (t) {
   buildBinary.getPath(function (e, path) {
     app = new spectron.Application({
-      path: path
+      path
     })
     t.end()
   })
@@ -82,7 +84,7 @@ test('Tab functionality', function (t) {
     .then(function () {
       return app.client.click('.close-tab')
     })
-    .then(function() {
+    .then(function () {
       return app.client.elements('.tab')
     })
     .then(function (tabs) {
@@ -116,28 +118,29 @@ test('Navbar updates tab value', function (t) {
     .then(function () {
       return app.client.click('#search-bar')
     })
-    .then(function(bar) {
+    .then(function (bar) {
       return app.client.keys('Enter')
     })
     // Keep checking to see if the page has loaded
-    .then(function() {
+    .then(function () {
       return new Promise(function (resolve, reject) {
         asyncLib.retry(
-          {times: 10, interval: 2000},
-          function(cb) {
+          { times: 10, interval: 2000 },
+          function (cb) {
             app.client.selectorExecute('webview', function (webview) {
-              return webview[0].isLoading() + ''
+              return `${webview[0].isLoading()}`
             })
             .then(function (isLoading) {
-              if (isLoading === 'false')
+              if (isLoading === 'false') {
                 return cb()
+              }
               return cb(new Error('WebView still loading...'))
             })
             .catch(cb)
           },
-          function(e) {
-            if(e) return reject(e)
-            else return resolve()
+          function (e) {
+            if (e) return reject(e)
+            return resolve()
           }
         )
       })
@@ -149,7 +152,7 @@ test('Navbar updates tab value', function (t) {
       })
     })
     .then(function (text) {
-      if(text !== 'Google') throw new Error('Invalid tab title: ' + text)
+      if (text !== 'Google') throw new Error(`Invalid tab title: ${text}`)
       return null
     })
     .catch(function (e) {
@@ -168,3 +171,5 @@ test('Navbar updates tab value', function (t) {
       return
     })
 })
+
+/* eslint-enable func-names */
