@@ -46,9 +46,10 @@ function registerTorrentProtocol(electron, cb) {
     .protocol
     .registerFileProtocol(config.protocol, peerProtocolHandler,
                           function registeredProtocol(e) {
-                            return cb(e)
+                            if(e)
+                              return cb(e)
                             // Don't treat our new protocol like http
-                            electron.registerStandardSchemes([config.protocol])
+                            electron.protocol.registerStandardSchemes([config.protocol])
                             // Done setting up our new protocol
                             return cb()
                           })
