@@ -36,7 +36,7 @@ ipcMain.on('global-status', function updateStatus (event, arg) {
   const status = {
     download: client.downloadSpeed,
     upload: client.uploadSpeed,
-    shared: client.torrents
+    torrents: client.torrents
   }
   // Send Asynchronous reply.
   event.sender.send('global-status-reply', status)// status is serialized internally
