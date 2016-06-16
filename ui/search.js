@@ -11,11 +11,20 @@
 // this application
 // eslint-disable-next-line prefer-const, no-use-before-define, no-var
 var peerWeb = peerWeb || {}
+var url = require('url')
 
 // Scope all functions exposed by this file to search
 peerWeb.search = peerWeb.search || {}
 
 ;(function scope () {
+  // Scrub the url to make it electron friendly
+  peerWeb.search.scrubUrl = function scrubUrl (addr) {
+    if(url.parse(addr).path == null) {
+      return `${addr}/`
+    }
+    return addr
+  }
+
   // checkSubmit is an event listener for the search bar in the UI. It waits
   // until a user presses enter and then sends the user to the URL typed into
   // the search bar
@@ -23,7 +32,9 @@ peerWeb.search = peerWeb.search || {}
     // If event is defined and the keyCode of the event is the enter key, go
     // ahead and try to send the user to the url they typed in
     if (e != null && e.keyCode === 13) {
-      peerWeb.ui.navigate(e.target.value)
+      const addr = peerWeb.search.scrubUrl(e.target.value)
+      document.getElementById('search-bar').value = addr
+      peerWeb.ui.navigate(addr)
     }
   }
 
