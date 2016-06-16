@@ -59,3 +59,8 @@ webview.selected {
   display: flex;
   flex-grow: 99999999;
 }
+
+#webtorrent-stats {
+  background-color: #bbc;
+  padding: 5px;
+}

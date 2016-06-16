@@ -23,8 +23,8 @@
     "tape": "4.5.1"
   },
   "scripts": {
-    "start": "electron --register-standard-schemes='peer' .",
-    "pretest": "eslint **/*.js",
+    "start": "electron .",
+    "pretest": "eslint --ignore-pattern 'node_modules' --ignore-pattern 'build' .",
     "test": "tape tests/*/**/*.js"
   }
 }

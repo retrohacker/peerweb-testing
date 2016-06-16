@@ -35,6 +35,18 @@
           .addEventListener('click', peerWeb.search.refresh)
       })
     </script>
+    <script>
+      var ipcRenderer = require('electron').ipcRenderer;
+      ipcRenderer.on('global-status-reply',function torrentStats(event, arg) {
+        document.getElementById('webtorrent-stats').innerHTML =
+          `Websites: ${arg.torrents.length} Download: ${arg.download} Upload: ${arg.upload}`
+      });
+
+      // Update UI with torrent stats every 1/2 second
+      setInterval(function updatTorrentStats () {
+        ipcRenderer.send('global-status','Anything');//Argument Doesn't Matter right now.
+      }, 500)
+    </script>
   </head>
   <body>
     <div id="nav-bar">
@@ -60,5 +72,6 @@
       </div>
     </div>
     <div id="content"></div>
+    <div id="webtorrent-stats"></div>
   </body>
 </html>
