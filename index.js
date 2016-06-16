@@ -24,6 +24,9 @@ const ipcMain = electron.ipcMain
 // WebTorrent gives our application the ability to download/seed torrents
 const WebTorrent = require('webtorrent')
 
+// prettier-bytes takes download/upload rates and makes them human friendly
+const pbytes = require('prettier-bytes')
+
 /* End Dependencies */
 
 // Create a new client responsible for seeding/downloading torrents
@@ -34,8 +37,8 @@ const client = new WebTorrent()
 ipcMain.on('global-status', function updateStatus (event, arg) {
   // status contains WebTorrent Client Stats
   const status = {
-    download: client.downloadSpeed,
-    upload: client.uploadSpeed,
+    download: pbytes(client.downloadSpeed),
+    upload: pbytes(client.uploadSpeed),
     torrents: client.torrents
   }
   // Send Asynchronous reply.
