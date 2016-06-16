@@ -63,8 +63,8 @@ function peerProtocolHandler (request, callback) {
   // the requested torrent, otherwise return the requested file
   let requestedFile = 'index.html'
 
-  if (url.length !== 1) {
-    requestedFile = path.join.apply(null, url.slice(1))
+  if(url.length !== 1 && url.slice(1)[0].length > 0) {
+    requestedFile = path.join.apply(null,url.slice(1))
   }
 
   // We want webtorrent to use the trackers from our config. We also create a
