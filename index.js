@@ -25,6 +25,10 @@ const WebTorrent = require('webtorrent')
 // prettier-bytes takes download/upload rates and makes them human friendly
 const pbytes = require('prettier-bytes')
 
+// parse-torrent lets us verify a torrent hash before passing it onto the
+// webtorrent handler
+const parseTorrent = require('parse-torrent')
+
 /* End Dependencies */
 
 // Create a new client responsible for seeding/downloading torrents
@@ -72,13 +76,19 @@ function peerProtocolHandler (request, callback) {
     path: path.join(__dirname, 'downloads', hash)
   }
 
+  // Ensure the torrent hash is valid before we pass it on to webtorrent
+  try {
+    parseTorrent(hash)
+  } catch(e) {
+    return callback(e)
+  }
+
   // Lets kick off the download through webtorrent
   client.add(hash, opts, function loaded (torrent) {
     console.log('Download started...') // eslint-disable-line no-console
     // Search the torrent for the requestedFile, if not found, return null
     let returnFile = null
     for (let i = 0; i < torrent.files.length; i++) {
-      console.log('Downloaded file', i) // eslint-disable-line no-console
       const file = torrent.files[i]
       // Webtorrent prepends the torrent name to the beginning of the file,
       // we want to remove that when searching for the requested file
@@ -100,6 +110,7 @@ function peerProtocolHandler (request, callback) {
     }
 
     // Give electron a path to the file on the local fs
+    console.log(`Returning: ${file}`)
     return callback({ path: file })
   })
 }
