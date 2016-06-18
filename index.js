@@ -4,8 +4,6 @@
  *   websites over torrent. For example, if you set this to 'peer', then any
  *   url prefixed with 'peer://' will be handled by our torrent protocol
  *
- * config.announce is an array of trackers to publish and check for torrents on
- *
 */
 const config = require('./config.json')
 require('electron-debug')({ showDevTools: true })
@@ -71,7 +69,6 @@ function peerProtocolHandler (request, callback) {
   // directory using the torrent's hash and have webtorrent download it's
   // contents there
   const opts = {
-    announce: config.announce,
     path: path.join(__dirname, 'downloads', hash)
   }
 
