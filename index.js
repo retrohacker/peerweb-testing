@@ -99,19 +99,26 @@ function peerProtocolHandler (request, callback) {
       }
     }
 
-    // If we found the file, get a path to the file, otherwise return null
-    let file = null
-    if (returnFile) {
-      file = path
-              .normalize(path.join(__dirname,
-                                   'downloads',
-                                   hash,
-                                   returnFile.path))
+    // Tell electron we didn't find the file
+    if(returnFile == null) {
+      console.log('File not found, returning null')
+      return callback(404)
     }
 
-    // Give electron a path to the file on the local fs
-    console.log(`Returning: ${file}`)
-    return callback({ path: file })
+    // Wait for the file to become available, downloading from the network at
+    // highest priority. This ensures we don't return a path to a file that
+    // hasn't finished downloading yet.
+    returnFile.getBuffer(function(e) {
+      // We don't actually care about the buffer, we only care if the file
+      // was downloaded
+      if(e) return callback(e)
+      // Generate the path to the file on the local fs
+      file = path.join(__dirname, 'downloads', hash, returnFile.path)
+
+      // Give the file back to electron
+      console.log(`Returning: ${file}`)
+      return callback({ path: file })
+    })
   })
 }
 
