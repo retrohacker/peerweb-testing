@@ -6,6 +6,12 @@
 </h1>
 <h2 align='center'>Coming Soon!<br><br></h2>
 
+### Donate
+
+Help fund this project through BitCoin
+
+BTC: 1EcF3agZoSa9bzj69Tjvj8zLE4MZddQ7m3
+
 ### Social
 
 Join us on IRC: #peerweb on Freenode
