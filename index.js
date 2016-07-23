@@ -13,6 +13,9 @@ require('electron-debug')({ showDevTools: true })
 // We use path to locate files on the local filesystem
 const path = require('path')
 
+// We use url to parse incomming requests for their file path
+const url = require('url')
+
 // Electron is used to render a browser for the user
 const electron = require('electron') // eslint-disable-line import/no-unresolved
 
@@ -43,40 +46,43 @@ ipcMain.on('global-status', function updateStatus (event, arg) {
     upload: pbytes(client.uploadSpeed),
     torrents: client.torrents
   }
-  // Send Asynchronous reply.
-  event.sender.send('global-status-reply', status)// status is serialized internally
+  // Send Asynchronous reply. Note that status is serialized internally
+  event.sender.send('global-status-reply', status)
 })
 
 // peerProtocolHandler resolves a peer:// request against a torrent, returning
 // the requested file as the result
-function peerProtocolHandler (request, callback) { // eslint-disable-line consistent-return
-  console.log('Starting download...') // eslint-disable-line no-console
-  // Grab the URL as an array, split around '/', and removing the prefixed
-  // protocol. This allows us to break the path apart further down
-  const url = request
-                .url
-                .substring((`${config.protocol}://`).length)
-                .split('/')
+function peerProtocolHandler (request, callback) {
+  // Take the incomming request and parse out the url components
+  const requestedUrl = url.parse(request.url)
 
-  // Our hash always comes first
-  const hash = url[0]
+  // If the requested file has a trailing `/`, assume it is a folder and add
+  // index.html to the end
+  let requestedFile = requestedUrl.pathname
 
-  // If our url only contained a hash, then return the index.html file from
-  // the requested torrent, otherwise return the requested file
-  let requestedFile = 'index.html'
-
-  if (url.length !== 1 && url.slice(1)[0].length > 0) {
-    requestedFile = path.join.apply(null, url.slice(1))
+  if (requestedFile.substring(requestedFile.length - 1) === '/') {
+    requestedFile += 'index.html'
   }
 
-  // We want webtorrent to use the trackers from our config. We also create a
-  // directory using the torrent's hash and have webtorrent download it's
-  // contents there
+  // Make sure the path isn't prefixed with a slash
+  if (requestedFile.substring(0, 1) === '/') {
+    requestedFile = requestedFile.substring(1)
+  }
+
+  // Log the requested file
+  console.log(requestedFile) // eslint-disable-line no-console
+
+  // The hash is the hostname of the requested url
+  const hash = requestedUrl.host
+
+  // We create a directory using the torrent's hash and have webtorrent
+  // download the website's contents there
   const opts = {
     path: path.join(__dirname, 'downloads', hash)
   }
 
-  // Ensure the torrent hash is valid before we pass it on to webtorrent
+  // Ensure the torrent hash is valid before we pass it on to webtorrent,
+  // othrewise WebTorrent may throw
   try {
     parseTorrent(hash)
   } catch (e) {
@@ -84,9 +90,8 @@ function peerProtocolHandler (request, callback) { // eslint-disable-line consis
   }
 
   // Lets kick off the download through webtorrent
-  client.add(hash, opts, function loaded (torrent) { // eslint-disable-line consistent-return
-    console.log('Download started...') // eslint-disable-line no-console
-    // Search the torrent for the requestedFile, if not found, return null
+  return client.add(hash, opts, function loaded (torrent) {
+    // Search the torrent for the requestedFile
     let returnFile = null
     for (let i = 0; i < torrent.files.length; i++) {
       const file = torrent.files[i]
@@ -99,16 +104,34 @@ function peerProtocolHandler (request, callback) { // eslint-disable-line consis
       }
     }
 
-    // Tell electron we didn't find the file
+    // If the requested file was not found, try assuming it is a directory and
+    // look for index.html in that directory
     if (returnFile == null) {
-      console.log('File not found, returning null')// eslint-disable-line no-console
+      requestedFile += '/index.html'
+      console.log(`Trying ${requestedFile}`) // eslint-disable-line no-console
+      for (let i = 0; i < torrent.files.length; i++) {
+        const file = torrent.files[i]
+        // Webtorrent prepends the torrent name to the beginning of the file,
+        // we want to remove that when searching for the requested file
+        const name = file.path.substring((`${torrent.name}/`).length)
+        if (name === requestedFile) {
+          // found it!
+          returnFile = file
+        }
+      }
+    }
+
+    // If it is still not found, tell electron we didn't find the file
+    if (returnFile == null) {
+      // eslint-disable-next-line no-console
+      console.log(`${requestedFile} not found, returning null`)
       return callback(404)
     }
 
     // Wait for the file to become available, downloading from the network at
     // highest priority. This ensures we don't return a path to a file that
     // hasn't finished downloading yet.
-    returnFile.getBuffer(function getBuffer (e) {
+    return returnFile.getBuffer(function getBuffer (e) {
       // We don't actually care about the buffer, we only care if the file
       // was downloaded
       if (e) return callback(e)
