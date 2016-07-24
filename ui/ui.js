@@ -209,6 +209,22 @@ peerWeb.ui = peerWeb.ui || {}
         tabName.appendChild(tabNameText)
       })
 
+    // If the webview element is currently selected, update the navbar to
+    // reflect its src when this function is called
+    function updateNavBar (url) {
+      // If the webview isn't selected, there is nothing to do
+      if (!peerWeb.utils.hasClass(newWebViewElement, 'selected')) {
+        return null
+      }
+
+      // Update the UI to reflect the new src
+      return peerWeb.ui.claimOwnership(id)
+    }
+
+    // Whenever the webview changes its src, update the navbar
+    newWebViewElement.addEventListener('did-navigate', updateNavBar)
+    newWebViewElement.addEventListener('did-navigate-in-page', updateNavBar)
+
     peerWeb.ui.claimOwnership(id)
   }
 
