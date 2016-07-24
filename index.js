@@ -107,14 +107,31 @@ function peerProtocolHandler (request, callback) {
     // If the requested file was not found, try assuming it is a directory and
     // look for index.html in that directory
     if (returnFile == null) {
-      requestedFile += '/index.html'
-      console.log(`Trying ${requestedFile}`) // eslint-disable-line no-console
+      // eslint-disable-next-line no-console
+      console.log(`Trying ${requestedFile}/index.html`)
       for (let i = 0; i < torrent.files.length; i++) {
         const file = torrent.files[i]
         // Webtorrent prepends the torrent name to the beginning of the file,
         // we want to remove that when searching for the requested file
         const name = file.path.substring((`${torrent.name}/`).length)
-        if (name === requestedFile) {
+        if (name === `${requestedFile}/index.html`) {
+          // found it!
+          returnFile = file
+        }
+      }
+    }
+
+    // If the requested file wasn't a folder, try checking if there is a file
+    // by the name of requestedFile.html in the torrent
+    if (returnFile == null) {
+      // eslint-disable-next-line no-console
+      console.log(`Trying ${requestedFile}.html`)
+      for (let i = 0; i < torrent.files.length; i++) {
+        const file = torrent.files[i]
+        // Webtorrent prepends the torrent name to the beginning of the file,
+        // we want to remove that when searching for the requested file
+        const name = file.path.substring((`${torrent.name}/`).length)
+        if (name === `${requestedFile}.html`) {
           // found it!
           returnFile = file
         }
