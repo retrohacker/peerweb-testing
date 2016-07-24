@@ -32,6 +32,18 @@ const pbytes = require('prettier-bytes')
 // webtorrent handler
 const parseTorrent = require('parse-torrent')
 
+// request will be used for the http fallback when parse-torrent says a request
+// was not in the form of a torrent info
+const request = require('request')
+
+// temp will allow us to save html files fetched over the http fallback and
+// they will be purged on application shutdown
+const temp = require('temp')
+temp.track()
+
+// fs will allow us to write to our temporary file
+const fs = require('fs')
+
 /* End Dependencies */
 
 // Create a new client responsible for seeding/downloading torrents
@@ -52,9 +64,9 @@ ipcMain.on('global-status', function updateStatus (event, arg) {
 
 // peerProtocolHandler resolves a peer:// request against a torrent, returning
 // the requested file as the result
-function peerProtocolHandler (request, callback) {
+function peerProtocolHandler (req, callback) {
   // Take the incomming request and parse out the url components
-  const requestedUrl = url.parse(request.url)
+  let requestedUrl = url.parse(req.url)
 
   // If the requested file has a trailing `/`, assume it is a folder and add
   // index.html to the end
@@ -81,12 +93,44 @@ function peerProtocolHandler (request, callback) {
     path: path.join(__dirname, 'downloads', hash)
   }
 
-  // Ensure the torrent hash is valid before we pass it on to webtorrent,
-  // othrewise WebTorrent may throw
+  // Ensure the torrent hash is valid before we pass it on to webtorrent, if it
+  // is not, try fetching it over http
   try {
     parseTorrent(hash)
-  } catch (e) {
-    return callback(e)
+  } catch (exception) {
+    // eslint-disable-next-line no-console
+    console.log('Not a torent identifier, falling back to http')
+    requestedUrl.protocol = 'http'
+    requestedUrl = url.format(requestedUrl)
+    return request(requestedUrl, function httpFallback (e, resp, body) {
+      // If we didn't get a 200 response, return an error
+      if (e) {
+        // eslint-disable-next-line no-console
+        console.log(`Failed to fetch ${requestedUrl}: ${e}`)
+        return callback(e)
+      } else if (resp.statusCode !== 200) {
+        // eslint-disable-next-line no-console
+        console.log(`Failed to fetch ${requestedUrl}: ${resp.statusCode}`)
+        return callback(resp.statusCode)
+      }
+
+      // Create a temporary file for our downloaded resource
+      return temp.open('peerwebhttp', function tempFileOpened (e2, info) {
+        if (e2) {
+          // eslint-disable-next-line no-console
+          console.log(`Failed to open temp file: ${e2}`)
+          return callback(e2)
+        }
+
+        // We then write our response to the temporary file and return the path
+        // back to electron to serve as the response
+        return fs.write(info.fd, body, function tempFileWritten () {
+          fs.close(info.fd, function tempFileClosed () {
+            return callback(info.path)
+          })
+        })
+      })
+    })
   }
 
   // Lets kick off the download through webtorrent
