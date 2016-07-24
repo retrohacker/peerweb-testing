@@ -8,7 +8,7 @@
 
 ### Donate
 
-Help fund this project through BitCoin
+Help fund this project with BitCoin
 
 BTC: 1EcF3agZoSa9bzj69Tjvj8zLE4MZddQ7m3
 
