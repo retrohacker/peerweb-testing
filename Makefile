@@ -23,15 +23,17 @@ run:
 	npm start
 
 test:
-	npm install
-	npm test
+	docker build -f ./dockerfiles/test.dockerfile -t peerweb:test .
 
 .PHONY: build
 build:
-	echo "Hello World"
+	# Build the image and get the artifact out
 	docker build -f ./dockerfiles/build.dockerfile -t peerweb:build .
-	rm -rf build/*
-	docker run -it -v build:/usr/src/app/build peerweb:build
+	docker run -it -v ${PWD}:/usr/src/output peerweb:build
+	# Untar the artifact
+	rm -rf output
+	tar -xvf output.tar
+	rm -f output.tar
 
 authors:
 	./bin/update-authors.sh
@@ -42,4 +44,5 @@ deps:
 	echo "    * docker $(shell which docker > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
 	echo "    * node $(shell which node > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
 	echo "    * npm $(shell which npm > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
+	echo "    * tar $(shell which tar > /dev/null || echo '- \033[31mNOT INSTALLED\033[37m')"
 	echo

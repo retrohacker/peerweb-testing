@@ -16,6 +16,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E03280
  && dpkg --add-architecture i386 \
  && apt-get update \
  && apt-get install -y --no-install-recommends \
+      zip \
       rpm \
       bsdtar \
       icnsutils \
@@ -40,5 +41,14 @@ RUN npm install
 
 COPY . .
 
+# Build all the artifacts
+RUN npm run build \
+ && rm -rf electron-tmp* \
+ && rm -rf build \
+ && tar -cf output.tar output \
+ && rm -rf output
 
-CMD ["npm", "run", "build"]
+RUN chmod +rw output.tar
+
+# Write the output directory tarball to stdout
+CMD ["mv", "output.tar", "/usr/src/output"]

@@ -1,7 +1,10 @@
 node_modules
-Dockerfile
-tests
+dockerfiles
 build
+output
+output.tar
 docs
 downloads
 README.md
+.git
+Makefile

@@ -51,6 +51,7 @@
   },
   "devDependencies": {
     "async": "^1.5.2",
+    "cross-zip": "retrohacker/cross-zip",
     "devtron": "^1.1.0",
     "electron-packager": "7.0.1",
     "electron-prebuilt": "1.0.1",
