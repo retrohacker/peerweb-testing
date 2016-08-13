@@ -22,7 +22,7 @@ let cachedBuild = null
 // This is the directory we will drop built artifacts into
 const outDir = path.join(__dirname, '..', 'build')
 
-// This is the name of the binary we will build
+// The name of the artifact we will be building
 const buildName = 'test-artifact'
 
 // Configuration settings for electron-packager
@@ -37,9 +37,20 @@ const opts = {
   out: outDir,
   // Give it a meaningful name in the event we fail to cleanup
   name: buildName,
+  // Overwrite a previous artifact if necessary
+  overwrite: true,
+  // Use a temporary directory to build the project
+  tmpdir: path.join(__dirname, '..', 'build'),
   // Give it a version to skip looking up the package.json, this avoids an
   // error condition we were reaching in the electron-packager module
-  version: packageJson.devDependencies['electron-prebuilt']
+  version: packageJson.devDependencies['electron-prebuilt'],
+  // Only install production deps in our artifact
+  prune: 'true',
+  // Don't include files from the build process in the artifact
+  ignore: [
+    /build/,
+    /output/
+  ]
 }
 
 /* Done defining globals */

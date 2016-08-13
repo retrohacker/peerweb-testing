@@ -1,14 +1,13 @@
 #!/usr/bin/env node
 
-var electron = require('electron-prebuilt')
-var cp = require('child_process')
-var path = require('path')
+const electron = require('electron-prebuilt')
+const cp = require('child_process')
+const path = require('path')
 
-var child = cp.spawn(electron,
+const child = cp.spawn(electron,
                      [path.join(__dirname, '..')],
-                     {stdio: 'inherit'},
-                     {'NODE_ENV': 'production'})
+                     { stdio: 'inherit' })
 
-child.on('close', function (code) {
+child.on('close', function peerwebExited (code) {
   process.exitCode = code
 })

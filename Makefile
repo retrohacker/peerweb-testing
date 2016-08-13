@@ -10,6 +10,7 @@ help:
 	echo "    test  - run the PeerWeb tests on the current source"
 	echo "    build - cut a release of PeerWeb"
 	echo "    clean - clean all build dependencies"
+	echo "    style - check the style guides"
 	echo "    authors - update the AUTHORS.md file"
 
 clean:
@@ -23,13 +24,14 @@ run:
 	npm start
 
 test:
-	docker build -f ./dockerfiles/test.dockerfile -t peerweb:test .
+	# docker build -f ./dockerfiles/test.dockerfile -t peerweb:test .
+	npm run test
 
 .PHONY: build
 build:
 	# Build the image and get the artifact out
 	docker build -f ./dockerfiles/build.dockerfile -t peerweb:build .
-	docker run -it -v ${PWD}:/usr/src/output peerweb:build
+	docker run --rm -it -v ${PWD}:/usr/src/output peerweb:build
 	# Untar the artifact
 	rm -rf output
 	tar -xvf output.tar
@@ -37,6 +39,9 @@ build:
 
 authors:
 	./bin/update-authors.sh
+
+style:
+	npm run pretest
 
 deps:
 	echo "  Dependencies: "

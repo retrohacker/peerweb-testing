@@ -6,37 +6,25 @@
  *      \o/ - woot
  */
 
+/* eslint-disable no-console */
+
 // We are going to pull in some stuff from our package.json to prevent
 // duplicating values
-var pkg = require('../package.json')
+const pkg = require('../package.json')
 
-var packager = require('electron-packager')
-var path = require('path')
-var zip = require('cross-zip')
-var async = require('async')
+const packager = require('electron-packager')
+const path = require('path')
+const zip = require('cross-zip')
+const async = require('async')
 
 /* Begin global configuration */
-// var artifactName = `${pkg.productName}-v${pkg.version}`
-var buildName = `${pkg.productName}-v${pkg.version}`
-var buildDir = path.join(__dirname, '..', 'build')
-var outputDir = path.join(__dirname, '..', 'output')
-var sourceDir = path.join(__dirname, '..')
+const buildName = `${pkg.productName}-v${pkg.version}`
+const buildDir = path.join(__dirname, '..', 'build')
+const outputDir = path.join(__dirname, '..', 'output')
+const sourceDir = path.join(__dirname, '..')
 /* End global configuration */
 
-// Build packages for all three OSs
-function build () {
-  buildLinux(function linuxBuilt (e) {
-    if (e) console.error(e.message || e)
-    buildWindows(function windowsBuilt (e) {
-      if (e) console.error(e.message || e)
-      buildDarwin(function darwinBuilt (e) {
-        if (e) console.error(e.message || e)
-      })
-    })
-  })
-}
-
-var buildConfAll = {
+const buildConfAll = {
   arch: 'all',
   name: pkg.productName,
   dir: sourceDir,
@@ -51,67 +39,80 @@ var buildConfAll = {
   ]
 }
 
-var buildConfLinux = {
+const buildConfLinux = {
   platform: 'linux'
 }
 
-var buildConfWindows = {
+const buildConfWindows = {
   platform: 'win32',
   arch: 'ia32'
 }
 
-var buildConfDarwin = {
+const buildConfDarwin = {
   platform: 'darwin',
   arch: 'x64'
 }
 
 function buildLinux (cb) {
-  var conf = Object.assign({}, buildConfAll, buildConfLinux)
+  const conf = Object.assign({}, buildConfAll, buildConfLinux)
   packager(conf, function linuxBuilt (e, output) {
     if (e) return cb(e)
     console.log(`Linux: ${output}`)
     console.log('Linux: Creating zip...')
 
-    function packageZips (outDir, cb) {
-      var inPath = path.join(outDir)
-      var base = path.basename(outDir).split('-')
-      var arch = base.pop()
-      var outPath = path.join(outputDir, `${buildName}-linux-${arch}.zip`)
-      zip.zip(inPath, outPath, function darwinZipped (e) {
-        return cb(e)
+    function packageZips (outDir, cb2) {
+      const inPath = path.join(outDir)
+      const base = path.basename(outDir).split('-')
+      const arch = base.pop()
+      const outPath = path.join(outputDir, `${buildName}-linux-${arch}.zip`)
+      zip.zip(inPath, outPath, function darwinZipped (e2) {
+        return cb2(e2)
       })
     }
 
-    async.each(output, packageZips, cb)
+    return async.each(output, packageZips, cb)
   })
 }
 
 function buildWindows (cb) {
-  var conf = Object.assign({}, buildConfAll, buildConfWindows)
+  const conf = Object.assign({}, buildConfAll, buildConfWindows)
   packager(conf, function windowsBuilt (e, output) {
     if (e) return cb(e)
     console.log(`Windows: ${output}`)
     console.log('Windows: Creating zip...')
 
-    var inPath = path.join(output[0])
-    var outPath = path.join(outputDir, `${buildName}-win.zip`)
-    zip.zip(inPath, outPath, function darwinZipped (e) {
-      return cb(e)
+    const inPath = path.join(output[0])
+    const outPath = path.join(outputDir, `${buildName}-win.zip`)
+    return zip.zip(inPath, outPath, function darwinZipped (ee) {
+      return cb(ee)
     })
   })
 }
 
 function buildDarwin (cb) {
-  var conf = Object.assign({}, buildConfAll, buildConfDarwin)
+  const conf = Object.assign({}, buildConfAll, buildConfDarwin)
   packager(conf, function darwinBuilt (e, output) {
     if (e) return cb(e)
     console.log(`Darwin: ${output}`)
     console.log('Darwin: Creating zip...')
 
-    var inPath = path.join(output[0], `${pkg.productName}.app`)
-    var outPath = path.join(outputDir, `${buildName}-darwin.zip`)
-    zip.zip(inPath, outPath, function darwinZipped (e) {
-      return cb(e)
+    const inPath = path.join(output[0], `${pkg.productName}.app`)
+    const outPath = path.join(outputDir, `${buildName}-darwin.zip`)
+    return zip.zip(inPath, outPath, function darwinZipped (e2) {
+      return cb(e2)
+    })
+  })
+}
+
+// Build packages for all three OSs
+function build () {
+  buildLinux(function linuxBuilt (e) {
+    if (e) console.error(e.message || e)
+    buildWindows(function windowsBuilt (e2) {
+      if (e2) console.error(e2.message || e2)
+      buildDarwin(function darwinBuilt (e3) {
+        if (e3) console.error(e3.message || e3)
+      })
     })
   })
 }

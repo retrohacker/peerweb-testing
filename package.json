@@ -45,7 +45,7 @@
   },
   "scripts": {
     "start": "electron .",
-    "pretest": "eslint --ignore-pattern 'node_modules' --ignore-pattern 'build' --ignore-pattern 'downloads' .",
+    "pretest": "eslint --ignore-pattern 'node_modules' --ignore-pattern 'build' --ignore-pattern 'downloads' --ignore-pattern 'output' .",
     "test": "tape tests/*/**/*.js",
     "build": "node ./bin/package.js"
   },
