@@ -1,4 +1,39 @@
 {
+  "name": "peerweb",
+  "description": "A proving ground for decentralized protocols for the WWW",
+  "version": "0.1.0",
+  "author": {
+    "name": "William Blankenship",
+    "email": "william.jblankenship@gmail.com",
+    "url": "http://will.blankenship.io/"
+  },
+  "bin": {
+    "peerweb": "./bin/cmd.js"
+  },
+  "bugs": {
+    "url": "https://github.com/retrohacker/peerweb/issues"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "homepage": "http://will.blankenship.io/peerweb",
+  "keywords": [
+    "desktop",
+    "electron",
+    "electron-app",
+    "webtorrent",
+    "torrent",
+    "decentralized",
+    "decentralization",
+    "mad science"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "productName": "PeerWeb",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:retrohacker/peerweb"
+  },
   "dependencies": {
     "electron-debug": "^1.0.0",
     "fs-chunk-store": "1.3.5",
@@ -7,6 +42,12 @@
     "request": "^2.74.0",
     "temp": "^0.8.3",
     "webtorrent": "0.81.2"
+  },
+  "scripts": {
+    "start": "electron .",
+    "pretest": "eslint --ignore-pattern 'node_modules' --ignore-pattern 'build' --ignore-pattern 'downloads' .",
+    "test": "tape tests/*/**/*.js",
+    "build": "node ./bin/package.js"
   },
   "devDependencies": {
     "async": "^1.5.2",
@@ -25,10 +66,5 @@
     "rimraf": "2.5.2",
     "spectron": "3.0.0",
     "tape": "4.5.1"
-  },
-  "scripts": {
-    "start": "electron .",
-    "pretest": "eslint --ignore-pattern 'node_modules' --ignore-pattern 'build' --ignore-pattern 'downloads' .",
-    "test": "tape tests/*/**/*.js"
   }
 }
