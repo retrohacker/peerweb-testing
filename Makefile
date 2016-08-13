@@ -10,6 +10,7 @@ help:
 	echo "    test  - run the PeerWeb tests on the current source"
 	echo "    build - cut a release of PeerWeb"
 	echo "    clean - clean all build dependencies"
+	echo "    authors - update the AUTHORS.md file"
 
 clean:
 	rm -rf node_modules
@@ -28,10 +29,12 @@ test:
 .PHONY: build
 build:
 	echo "Hello World"
-	docker build -t peerweb:build .
+	docker build -f ./dockerfiles/build.dockerfile -t peerweb:build .
 	rm -rf build/*
 	docker run -it -v build:/usr/src/app/build peerweb:build
 
+authors:
+	./bin/update-authors.sh
 
 deps:
 	echo "  Dependencies: "
