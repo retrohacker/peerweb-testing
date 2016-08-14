@@ -1,0 +1,9 @@
+osx_image: xcode8
+language: nodejs
+node_js:
+  - "5.10"
+before_script:
+  - wget https://distfiles.macports.org/MacPorts/MacPorts-2.3.4-10.11-ElCapitan.pkg
+  - sudo installer -pkg MacPorts-2.3.4-10.11-ElCapitan.pkg - target /
+  - sudo port selfupdate
+  - sudo port upgrade
