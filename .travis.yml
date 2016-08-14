@@ -7,3 +7,4 @@ before_script:
   - sudo installer -pkg MacPorts-2.3.4-10.11-ElCapitan.pkg - target /
   - sudo port selfupdate
   - sudo port upgrade
+  - sudo port install firefox-x11
