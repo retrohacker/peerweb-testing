@@ -1,6 +1,9 @@
-os:
-  - osx
-osx_image: xcode8
+
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode8
+
 language: nodejs
 node_js:
   - "5.10"
