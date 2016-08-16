@@ -13,9 +13,5 @@ before_install:
   - sudo xvfb :99 -ac -screen 0 1024x1024x16 &
   - sleep 3
 
-before_script:
-  - node bin/package.js
-  - npm start
-
 after_success:
   - node bin/package.js
