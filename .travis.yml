@@ -8,13 +8,12 @@ language: node_js
 node_js:
   - 5.10
 
-before_script:
-  - wget https://distfiles.macports.org/MacPorts/MacPorts-2.3.4-10.11-ElCapitan.pkg
-  - sudo installer -pkg MacPorts-2.3.4-10.11-ElCapitan.pkg -target /
-  - export PATH=/opt/local/bin:/opt/local/sbin:$PATH
-  - sudo port selfupdate
-    #  - sudo port install firefox-x11
+before_install:
+  #  - wget https://distfiles.macports.org/MacPorts/MacPorts-2.3.4-10.11-ElCapitan.pkg
+  #  - sudo installer -pkg MacPorts-2.3.4-10.11-ElCapitan.pkg -target /
+  #  - export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+  #  - sudo port selfupdate
+  #  - sudo port install firefox-x11
   - export DISPLAY=":99.0"
-  - xvfb :99 -ac -screen 0 1024x768x8 -kb &
+  - xvfb :99 -ac -screen 0 1024x1024x16 &
   - sleep 3
-
