@@ -13,7 +13,7 @@ before_script:
   - sudo installer -pkg MacPorts-2.3.4-10.11-ElCapitan.pkg -target /
   - export PATH=/opt/local/bin:/opt/local/sbin:$PATH
   - sudo port selfupdate
-  - sudo port install firefox-x11
+    #  - sudo port install firefox-x11
   - export DISPLAY=":99.0"
   - xvfb :99 -ac -screen 0 1024x768x8 -kb &
   - sleep 3
