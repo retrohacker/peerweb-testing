@@ -9,6 +9,7 @@ node_js:
   - 5.10
 
 before_install:
+  - brew update
   - brew tap caskroom/cask
   - brew cask install java xquartz
   - brew install wine
