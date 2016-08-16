@@ -3,6 +3,11 @@ os:
 
 osx_image: xcode7.3
 
+language: node_js
+
+node_js:
+  - 5.10
+
 before_script:
   - wget https://distfiles.macports.org/MacPorts/MacPorts-2.3.4-10.11-ElCapitan.pkg
   - sudo installer -pkg MacPorts-2.3.4-10.11-ElCapitan.pkg -target /
@@ -11,4 +16,5 @@ before_script:
   - sudo port install firefox-x11
   - export DISPLAY=":99.0"
   - xvfb :99 -ac -screen 0 1024x768x8 -kb &
+  - sleep 3
 
