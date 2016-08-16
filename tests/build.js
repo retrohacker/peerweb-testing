@@ -103,6 +103,7 @@ module.exports.getPath = function getPath (cb) {
           case 'darwin':
             cachedBuild = path.join(paths[0],
               `${buildName}.app`,
+              'Contents',
               'MacOS',
               buildName)
             break
