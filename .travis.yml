@@ -1,5 +1,5 @@
-os: osx
-osx_image: xcode8
+os:
+  - osx
 
 before_script:
   - wget https://distfiles.macports.org/MacPorts/MacPorts-2.3.4-10.11-ElCapitan.pkg
