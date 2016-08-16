@@ -11,8 +11,10 @@ node_js:
 before_install:
   - export DISPLAY=":99.0"
   - sudo xvfb :99 -ac -screen 0 1024x1024x16 &
-  - find build -type f
   - sleep 3
 
 after_success:
   - node bin/package.js
+
+after_failure:
+  - find build -type f
