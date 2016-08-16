@@ -9,15 +9,13 @@ node_js:
   - 5.10
 
 before_install:
-  #  - wget https://distfiles.macports.org/MacPorts/MacPorts-2.3.4-10.11-ElCapitan.pkg
-  #  - sudo installer -pkg MacPorts-2.3.4-10.11-ElCapitan.pkg -target /
-  #  - export PATH=/opt/local/bin:/opt/local/sbin:$PATH
-  #  - sudo port selfupdate
-  #  - sudo port install firefox-x11
   - export DISPLAY=":99.0"
   - sudo xvfb :99 -ac -screen 0 1024x1024x16 &
   - sleep 3
 
-post_install:
+before_script:
   - node bin/package.js
   - find output -type f
+
+after_success:
+  - node bin/package.js
