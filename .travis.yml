@@ -1,4 +1,4 @@
-os:
+nstallos:
   - osx
 
 osx_image: xcode7.3
@@ -9,7 +9,7 @@ node_js:
   - 5.10
 
 before_install:
-  - brew install caskroom/cask
+  - brew tap caskroom/cask
   - brew cask install java xquartz
   - brew install wine
   - export DISPLAY=":99.0"
