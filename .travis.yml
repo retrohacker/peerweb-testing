@@ -15,5 +15,5 @@ before_install:
   #  - sudo port selfupdate
   #  - sudo port install firefox-x11
   - export DISPLAY=":99.0"
-  - xvfb :99 -ac -screen 0 1024x1024x16 &
+  - sudo xvfb :99 -ac -screen 0 1024x1024x16 &
   - sleep 3
