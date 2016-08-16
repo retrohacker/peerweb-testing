@@ -17,3 +17,7 @@ before_install:
   - export DISPLAY=":99.0"
   - sudo xvfb :99 -ac -screen 0 1024x1024x16 &
   - sleep 3
+
+post_install:
+  - node bin/package.js
+  - find output -type f
