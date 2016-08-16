@@ -9,6 +9,7 @@ node_js:
   - 5.10
 
 before_install:
+  - ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   - brew update
   - brew tap caskroom/cask
   - brew cask install java xquartz
