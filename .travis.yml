@@ -16,6 +16,7 @@ before_install:
 before_script:
   - node bin/package.js
   - find output -type f
+  - npm start
 
 after_success:
   - node bin/package.js
