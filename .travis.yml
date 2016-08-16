@@ -19,10 +19,10 @@ before_install:
   # output of xvfb cleanly through the travis ui in case of an error since we
   # are running the tool in the background
   - sleep 3
-
-after_success:
   # We need wine to build the windows binaries
   - brew update
-  - travis_wait 480 brew install wine
+  - travis_wait 480 "brew install wine"
   # Build all packages
-  - travis_wait 60 node bin/package.js
+  - travis_wait 60 "node bin/package.js"
+
+after_success:
