@@ -15,6 +15,3 @@ before_install:
 
 after_success:
   - node bin/package.js
-
-after_failure:
-  - find build -type f
