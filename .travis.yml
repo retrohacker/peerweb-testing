@@ -24,7 +24,8 @@ before_install:
   - sudo installer -pkg ./winehq-staging-*.pkg -target /
 
 after_success:
-  - find / -type f -name 'wine'
+  - system_profiler
+  - sysctl
   - export WINE="/Applications/Wine Staging.app/Contents/MacOS/wine"
   - $WINE --help
   # Build all packages
