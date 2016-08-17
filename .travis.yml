@@ -21,7 +21,7 @@ before_install:
   - sleep 3
   # We need wine to build the windows binaries
   - brew update
-  - brew --verbose install --verbose wine
+  - brew install --verbose wine
   #- ./bin/travis-wine.sh
   # Build all packages
   - node bin/package.js
