@@ -25,5 +25,6 @@ before_install:
 
 after_success:
   - find / -type f -name 'wine'
+  - export PATH="/Applications/Wine Staging.app/Contents/MacOS/wine":$PATH
   # Build all packages
   - node bin/package.js
