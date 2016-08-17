@@ -18,10 +18,10 @@ before_install:
   # Wait for xvfb to fully come up, also gives us a chance to capture the
   # output of xvfb cleanly through the travis ui in case of an error since we
   # are running the tool in the background
-  - sleep 3
+  #- sleep 3
   # We need wine to build the windows binaries
-  - brew update
-  - brew install --verbose wine
+  - wget https://dl.winehq.org/wine-builds/macosx/i686/winehq-staging-1.9.16.pkg
+  - installer winehq-staging-*.pkg
   #- ./bin/travis-wine.sh
   # Build all packages
   - node bin/package.js
