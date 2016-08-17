@@ -24,5 +24,6 @@ before_install:
   - sudo installer -pkg ./winehq-staging-*.pkg -target /
 
 after_success:
+  find / -type f -name 'wine'
   # Build all packages
   - node bin/package.js
