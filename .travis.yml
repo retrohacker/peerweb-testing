@@ -11,18 +11,18 @@ node_js:
 
 before_install:
   # The version of electron we use ships with Node v5.10.0, match it
-  - nvm install 5.10.0
+  #- nvm install 5.10.0
   # Headless browser testing for electron app
-  - export DISPLAY=":99.0"
-  - sudo xvfb :99 -ac -screen 0 1024x1024x16 &
+  #- export DISPLAY=":99.0"
+  #- sudo xvfb :99 -ac -screen 0 1024x1024x16 &
   # Wait for xvfb to fully come up, also gives us a chance to capture the
   # output of xvfb cleanly through the travis ui in case of an error since we
   # are running the tool in the background
   - sleep 3
   # We need wine to build the windows binaries
   - brew update
-  - travis_wait 480 "brew install wine"
+  - ./bin/travis-wine.sh
   # Build all packages
-  - travis_wait 60 "node bin/package.js"
+  - node bin/package.js
 
 after_success:
