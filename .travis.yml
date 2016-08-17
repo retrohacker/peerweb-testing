@@ -21,7 +21,7 @@ before_install:
   #- sleep 3
   # We need wine to build the windows binaries
   - wget https://dl.winehq.org/wine-builds/macosx/i686/winehq-staging-1.9.16.pkg
-  - installer -pkg ./winehq-staging-*.pkg -target /
+  - sudo installer -pkg ./winehq-staging-*.pkg -target /
   #- ./bin/travis-wine.sh
   # Build all packages
   - node bin/package.js
