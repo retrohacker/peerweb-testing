@@ -24,9 +24,7 @@ before_install:
   - sudo installer -pkg ./winehq-staging-*.pkg -target /
 
 after_success:
-  - system_profiler
-  - sysctl
-  - export WINE="/Applications/Wine Staging.app/Contents/MacOS/wine"
-  - $WINE --help
+  - export PATH="/Applications/Wine Staging.app/Contents/MacOS/wine":$PATH
+  - wine --help
   # Build all packages
   - node bin/package.js
