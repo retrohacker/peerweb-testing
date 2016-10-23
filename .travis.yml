@@ -28,6 +28,9 @@ before_install:
 install:
   - yarn
 
+test:
+  - yarn test
+
 after_success:
   - export PATH="/Applications/Wine Staging.app/Contents/MacOS/wine":$PATH
   - wine --help
