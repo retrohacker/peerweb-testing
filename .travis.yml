@@ -20,7 +20,7 @@ before_install:
   # are running the tool in the background
   - sleep 3
   # We need wine to build the windows binaries
-  - wget https://dl.winehq.org/wine-builds/macosx/i686/winehq-staging-1.9.16.pkg
+  - wget https://dl.winehq.org/wine-builds/macosx/i686/winehq-staging-1.9.21.pkg
   - sudo installer -pkg ./winehq-staging-*.pkg -target /
 
 after_success:
