@@ -22,9 +22,11 @@ before_install:
   # We need wine to build the windows binaries
   - wget https://dl.winehq.org/wine-builds/macosx/i686/winehq-staging-1.9.21.pkg
   - sudo installer -pkg ./winehq-staging-*.pkg -target /
+  - brew update
+  - brew install yarn
 
 install:
-  - yarn
+  - $HOME/.yarn/bin/yarn
 
 after_success:
   - export PATH="/Applications/Wine Staging.app/Contents/MacOS/wine":$PATH
