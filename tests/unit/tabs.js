@@ -113,10 +113,10 @@ test('Navbar updates tab value', function (t) {
   app.start()
     // Set the URL to google and then press enter
     .then(function () {
-      return app.client.setValue('#search-bar', 'http://www.google.com')
+      return app.client.click('#search-bar')
     })
     .then(function () {
-      return app.client.click('#search-bar')
+      return app.client.setValue('#search-bar', 'https://www.google.com')
     })
     .then(function (bar) {
       return app.client.keys('Enter')
