@@ -132,8 +132,7 @@ test('Navbar updates tab value', function (t) {
             })
             .then(function (isLoading) {
               if (isLoading === 'false') {
-                // Give UI a chance to render. Magic numbers...
-                return setTimeout(cb, 1000)
+                return cb()
               }
               return cb(new Error('WebView still loading...'))
             })
