@@ -26,7 +26,7 @@ before_install:
   - brew install yarn
 
 install:
-  - $HOME/.yarn/bin/yarn
+  - yarn
 
 after_success:
   - export PATH="/Applications/Wine Staging.app/Contents/MacOS/wine":$PATH
