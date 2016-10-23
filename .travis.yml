@@ -23,6 +23,9 @@ before_install:
   - wget https://dl.winehq.org/wine-builds/macosx/i686/winehq-staging-1.9.21.pkg
   - sudo installer -pkg ./winehq-staging-*.pkg -target /
 
+install:
+  - yarn
+
 after_success:
   - export PATH="/Applications/Wine Staging.app/Contents/MacOS/wine":$PATH
   - wine --help
